@@ -3,6 +3,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const taraEl = document.getElementById("tara");
   const netoEl = document.getElementById("neto");
   const fechaEl = document.getElementById("fecha");
+  const horaEl = document.getElementById("hora");
+
+  
+  iniciarReloj(horaEl);
+  function iniciarReloj(horaEl) {
+    function actualizarHora() {
+      const ahora = new Date();
+      const horaLocal = ahora.toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false  // usar formato 24h
+      });
+      horaEl.textContent = horaLocal;
+    }
+
+    actualizarHora();              // mostrar de inmediato
+    setInterval(actualizarHora, 1000); // actualizar cada segundo
+  }
+
+
 
   // Mostrar fecha actual
   const hoy = new Date();

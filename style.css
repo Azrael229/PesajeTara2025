@@ -71,10 +71,20 @@ body {
 
 .pantalla-header {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
+  flex-direction: column; /* apilar título arriba y info abajo */
+  font-size: 18px;
   font-weight: bold;
   color: #58a6ff;
+  margin-bottom: 10px;
+  /* border: 1px solid white;  */
+}
+
+.pantalla-header .info {
+  margin-top: 30px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between; /* fecha a la izquierda, hora a la derecha */
+  /* border: 1px solid white; */
 }
 
 .peso {
@@ -83,6 +93,7 @@ body {
   font-size: 20px;
   border-top: 1px solid #58a6ff44;
   padding: 6px 0;
+  /* border: 1px solid white;  */
 }
 
 .peso strong {
@@ -97,6 +108,7 @@ body {
   display: flex;
   justify-content: space-around;
   margin-top: 20px;
+  /* border: 1px solid white;  */
 }
 
 .led {
