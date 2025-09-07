@@ -38,6 +38,17 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.4);
 }
 
+.teclado-functions{
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  grid-gap: 10px;
+}
+
+.teclado-functions button{
+  font-size: 17px;
+  font-weight: bold;
+}
+
 .teclado button:hover {
   background: #30363d;
   transform: scale(1.05);
