@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pesaje Tara</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bascula">
+    <!-- Teclado en pantalla -->
+    <div class="teclado">
+      <button data-key="7">7</button>
+      <button data-key="8">8</button>
+      <button data-key="9">9</button>
+      <button data-key="4">4</button>
+      <button data-key="5">5</button>
+      <button data-key="6">6</button>
+      <button data-key="1">1</button>
+      <button data-key="2">2</button>
+      <button data-key="3">3</button>
+      <button data-key="C" style="font-weight:bold;">C</button>
+      <button data-key="0">0</button>
+        <!-- Otros botones 0-9 -->
+      <button class="btn" data-key=".">.</button>
+      <button>Prod</button>
+      <button>ZERO</button>
+      <button style="grid-column: span 2;">Print</button>
+    </div>
+
+    <!-- Pantalla -->
+    <div class="pantalla">
+      <div class="pantalla-header">
+        <span>CARNE DE RES 3/16</span>
+        <span id="fecha"></span>
+      </div>
+      <div class="peso"><span>BRUTO</span><strong id="bruto">795.5</strong><span>kg</span></div>
+      <div class="peso"><span>TARA</span><strong id="tara">0</strong><span>kg</span></div>
+      <div class="peso"><span>NETO</span><strong id="neto">795.5</strong><span>kg</span></div>
+      <div class="indicadores">
+        <div class="led-container">
+          <div class="led"></div>
+          <div class="led-label">COM</div>
+        </div>
+        <div class="led-container">
+          <div class="led"></div>
+          <div class="led-label">ZERO</div>
+        </div>
+        <div class="led-container">
+          <div class="led"></div>
+          <div class="led-label">STABLE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

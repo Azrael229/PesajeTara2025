@@ -1,0 +1,9 @@
+# Evita subir la carpeta de dependencias
+node_modules/
+
+# Evita subir archivos de entorno
+.env
+
+# Archivos de log
+npm-debug.log
+yarn-error.log
