@@ -136,10 +136,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Guardar registro en la API
     window.pesajeAPI.guardarRegistro(data).then(respuesta => {
-    // console.log("Respuesta del main:", respuesta);
-    alert(respuesta);
+      // Si el mensaje empieza con ❌, lo consideramos error
+      if (respuesta.startsWith("❌")) {
+        mostrarToast(respuesta, "error");
+      } else {
+        mostrarToast(respuesta, "success");
+      }
     });
+
   });
+
+  function mostrarToast(mensaje, tipo) {
+  const container = document.getElementById("toast-container");
+
+  const toast = document.createElement("div");
+  toast.classList.add("toast");
+  toast.classList.add(tipo === "error" ? "toast-error" : "toast-success");
+  toast.innerText = mensaje;
+
+  container.appendChild(toast);
+
+  // Desaparece después de 3 segundos
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => container.removeChild(toast), 300);
+  }, 3000);
+  };
+
 
   // Inicializar pantalla
   actualizarNeto();
