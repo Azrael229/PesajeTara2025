@@ -1,11 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   const brutoEl = document.getElementById("bruto");
   const taraEl = document.getElementById("tara");
   const netoEl = document.getElementById("neto");
   const fechaEl = document.getElementById("fecha");
   const horaEl = document.getElementById("hora");
+  const printButton = document.getElementById("print");
 
-  
+
+
+
   iniciarReloj(horaEl);
   function iniciarReloj(horaEl) {
     function actualizarHora() {
@@ -22,8 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarHora();              // mostrar de inmediato
     setInterval(actualizarHora, 1000); // actualizar cada segundo
   }
-
-
 
   // Mostrar fecha actual
   const hoy = new Date();
@@ -106,6 +108,36 @@ document.addEventListener("DOMContentLoaded", () => {
         agregarCaracter(key);
       }
       actualizarNeto();
+    });
+  });
+
+  // Funcion para escuchar el evento de clic en el botón de impresión y crear el objeto de valores a imprimir
+  printButton.addEventListener("click", () => {
+    // Obtener los valores de los campos de la interfaz
+    const bruto = document.getElementById("bruto").innerText;
+    const tara = document.getElementById("tara").innerText;
+    const neto = document.getElementById("neto").innerText;
+    const producto = document.getElementById("producto").innerText;
+    const hora = document.getElementById("hora").innerText;
+    const fecha = document.getElementById("fecha").innerText;
+
+    // Crear el objeto con los valores
+    const data = {
+      bruto,
+      tara,
+      neto,
+      producto,
+      hora,
+      fecha
+    };
+
+    // Imprimir en consola para revisar
+    // console.log("Registro a guardar:", registro);
+
+    // Guardar registro en la API
+    window.pesajeAPI.guardarRegistro(data).then(respuesta => {
+    // console.log("Respuesta del main:", respuesta);
+    alert(respuesta);
     });
   });
 

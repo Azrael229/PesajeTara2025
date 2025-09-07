@@ -22,7 +22,33 @@ function createWindow() {
   });
   win.loadFile('index.html');
 }
-app.whenReady().then(createWindow);
+
+// Cuando el renderer invoque guardarRegistro, se maneja aquí
+ipcMain.handle("guardar-registro", (event, data) => {
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO pesajes 
+      (peso_bruto, peso_tara, peso_neto, producto, peso_hora, peso_fecha) 
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(
+      data.bruto,
+      data.tara,
+      data.neto,
+      data.producto,
+      data.hora,
+      data.fecha
+    );
+
+    // Mensaje con icono de check ✅ para éxito
+    return "✅ Registro guardado correctamente en Base de datos"; 
+  } catch (error) {
+    // Mensaje con icono de cruz ❌ para error
+    return "❌ Error: no se pudo guardar el registro en la Base de datos";
+  }
+});
+
 
 
 
@@ -38,3 +64,6 @@ ipcMain.on('insert-usuario', (event, data) => {
   // Enviar confirmación al renderer
   event.sender.send('usuario-agregado', data);
 });
+
+
+app.whenReady().then(createWindow);
