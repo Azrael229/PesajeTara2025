@@ -1,9 +1,28 @@
-# Evita subir la carpeta de dependencias
+# Node.js
 node_modules/
 
-# Evita subir archivos de entorno
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de entorno
 .env
 
-# Archivos de log
-npm-debug.log
-yarn-error.log
+# Bases de datos locales (opcional, si no quieres subirla)
+*.db
+
+# Sistemas operativos
+.DS_Store
+Thumbs.db
+
+# Archivos de editor
+.vscode/
+*.code-workspace
+
+# Paquetes
+*.tgz
+
+# Otros
+dist/
+build/
