@@ -10,7 +10,7 @@ yarn-error.log*
 .env
 
 # Bases de datos locales (opcional, si no quieres subirla)
-*.db
+BD.db
 
 # Sistemas operativos
 .DS_Store
