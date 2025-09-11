@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fechaEl = document.getElementById("fecha");
   const horaEl = document.getElementById("hora");
   const printButton = document.getElementById("print");
+  
 
 
 
@@ -163,6 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => container.removeChild(toast), 300);
   }, 3000);
   };
+
+
+  
+  // Escuchar los datos serial enviados desde main.js
+  window.electronAPI.onSerialData((data) => {
+    // data.value contiene el número formateado exactamente como el indicador
+    brutoEl.textContent = data.value;
+  });
 
 
   // Inicializar pantalla

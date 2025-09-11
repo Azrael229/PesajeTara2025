@@ -2,6 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
+import { SerialPort } from "serialport";
+import { ReadlineParser } from "@serialport/parser-readline";
+
 
 // Para obtener __dirname en ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -9,9 +12,11 @@ const __dirname = path.dirname(__filename);
 
 const db = new Database('BD.db');
 
+let mainWindow;
+
 // Escuchar evento para crear ventana
 function createWindow() {
-  let win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
       width: 800,
       height: 600,
       webPreferences: {
@@ -20,7 +25,7 @@ function createWindow() {
           contextIsolation: true,      
         }
   });
-  win.loadFile('index.html');
+  mainWindow.loadFile('index.html');
 }
 
 // Cuando el renderer invoque guardarRegistro, se maneja aquí
@@ -51,19 +56,45 @@ ipcMain.handle("guardar-registro", (event, data) => {
 
 
 
-
-
-// Escuchar evento para insertar usuario
-ipcMain.on('insert-usuario', (event, data) => {
-  const insert  = db.prepare(`
-    INSERT INTO usuarios (nombre_user, rol_user, password_user) 
-    VALUES (?, ?, ?)
-  `);
-  insert.run(data.nombre, data.rol, data.password);
-
-  // Enviar confirmación al renderer
-  event.sender.send('usuario-agregado', data);
+const port = new SerialPort({
+  path: "COM3",   // ⚠️ cámbialo por tu puerto real
+  baudRate: 9600, // ⚠️ ajusta según tu báscula
 });
 
+  // Parser con delimitador CRLF
+  const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
+
+  parser.on("data", (line) => {
+    const raw = line.toString().trim();
+
+    // Extraer el número exacto respetando decimales y signo
+    let formatted = raw.match(/[-+]?[0-9]+(?:\.[0-9]+)?/g)?.join("") || "0.00";
+
+    // Eliminar ceros sobrantes a la izquierda (manteniendo cero antes del punto)
+    formatted = formatted.replace(/^(-?)0+(?=\d)/, "$1");
+
+    // Imprimir en consola (para pruebas)
+    // console.log(formatted);
+
+    // Enviar al renderer para actualizar UI / guardar en BD
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("serial-data", { raw, value: formatted });
+    }
+
+  });
+
+  port.on("error", (err) => {
+    console.error("Error en el puerto serial:", err);
+  });
+
+
+  
 
 app.whenReady().then(createWindow);
+
+
+
+
+app.on("before-quit", () => {
+  if (port?.isOpen) port.close();
+});

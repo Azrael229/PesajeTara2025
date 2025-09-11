@@ -11,8 +11,10 @@
     "start": "electron ."
   },
   "dependencies": {
+    "@serialport/parser-readline": "^13.0.0",
     "better-sqlite3": "^12.2.0",
-    "electron": "^38.0.0"
+    "electron": "^38.0.0",
+    "serialport": "^13.0.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
