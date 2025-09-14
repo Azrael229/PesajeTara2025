@@ -6,84 +6,71 @@ document.addEventListener("DOMContentLoaded", () => {
   const fechaEl = document.getElementById("fecha");
   const horaEl = document.getElementById("hora");
   const printButton = document.getElementById("print");
-  
-
-
-
+  const ledCOM = document.getElementById("led-com");
 
   iniciarReloj(horaEl);
+
   function iniciarReloj(horaEl) {
     function actualizarHora() {
       const ahora = new Date();
-      const horaLocal = ahora.toLocaleTimeString("es-MX", {
+      horaEl.textContent = ahora.toLocaleTimeString("es-MX", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: false  // usar formato 24h
+        hour12: false
       });
-      horaEl.textContent = horaLocal;
     }
-
-    actualizarHora();              // mostrar de inmediato
-    setInterval(actualizarHora, 1000); // actualizar cada segundo
+    actualizarHora();
+    setInterval(actualizarHora, 1000);
   }
 
-  // Mostrar fecha actual
   const hoy = new Date();
-  fechaEl.textContent = hoy.toISOString().split("T")[0];
+  fechaEl.textContent = hoy.toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
 
-  // Variables internas como string para manejar punto decimal
+
+  // Variables internas
   let bruto = brutoEl.textContent || "0";
   let tara = "0";
-
-  // ---- Función para limitar a 8 dígitos ----
-  function limitarDigitos(str) {
-    if (!str) return "0";
-
-    // separar parte entera y decimal
-    let [entero, decimal] = str.split(".");
-
-    if (entero.length > 8) entero = entero.slice(0, 8);
-
-    if (decimal !== undefined) {
-      return entero + "." + decimal;
-    } else {
-      return entero;
-    }
-  }
+  let decimalCount = 2; // por defecto 2 decimales, se actualizará según báscula
 
   // ---- Actualizar Neto ----
   function actualizarNeto() {
-    let neto = parseFloat(bruto) - parseFloat(tara);
-    brutoEl.textContent = limitarDigitos(bruto);
-    taraEl.textContent = limitarDigitos(tara);
-    netoEl.textContent = limitarDigitos(neto.toString());
+    const neto = parseFloat(bruto) - parseFloat(tara);
+    brutoEl.textContent = parseFloat(bruto).toFixed(decimalCount);
+    taraEl.textContent = parseFloat(tara).toFixed(decimalCount);
+    netoEl.textContent = neto.toFixed(decimalCount);
   }
 
-  // ---- Función para agregar caracteres ----
+  // ---- Función para agregar caracteres (tara) ----
   function agregarCaracter(c) {
     if (!c) return;
 
-    // Retroceso
     if (c === "Backspace") {
       tara = tara.slice(0, -1) || "0";
       actualizarNeto();
       return;
     }
 
-    // Solo permitir un punto decimal
     if (c === "." && tara.includes(".")) return;
 
-    // Limitar 8 dígitos (sin contar punto)
+    // Limitar decimales según decimalCount
+    if (tara.includes(".")) {
+      const decimales = tara.split(".")[1];
+      if (decimales.length >= decimalCount) return;
+    }
+
     const valorSinPunto = tara.replace(".", "");
     if (valorSinPunto.length >= 8) return;
 
-    // Concatenar
     tara = (tara === "0" && c !== ".") ? c : tara + c;
     actualizarNeto();
   }
 
-  // ---- Entrada por teclado físico ----
+  // Entrada por teclado físico
   document.addEventListener("keydown", (e) => {
     if ((e.key >= "0" && e.key <= "9") || e.key === "." || e.key === "Decimal") {
       e.preventDefault();
@@ -97,12 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---- Entrada por teclado virtual ----
+  // Entrada por teclado virtual
   document.querySelectorAll(".teclado button").forEach(btn => {
     btn.addEventListener("click", () => {
       const key = btn.dataset.key;
       if (!key) return;
-
       if (key === "C") {
         tara = "0";
       } else {
@@ -112,67 +98,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Funcion para escuchar el evento de clic en el botón de impresión y crear el objeto de valores a imprimir
+  // Guardar registro
   printButton.addEventListener("click", () => {
-    // Obtener los valores de los campos de la interfaz
-    const bruto = document.getElementById("bruto").innerText;
-    const tara = document.getElementById("tara").innerText;
-    const neto = document.getElementById("neto").innerText;
-    const producto = document.getElementById("producto").innerText;
-    const hora = document.getElementById("hora").innerText;
-    const fecha = document.getElementById("fecha").innerText;
-
-    // Crear el objeto con los valores
     const data = {
       bruto,
       tara,
-      neto,
-      producto,
-      hora,
-      fecha
+      neto: (parseFloat(bruto) - parseFloat(tara)).toFixed(decimalCount),
+      producto: document.getElementById("producto").innerText,
+      hora: horaEl.textContent,
+      fecha: fechaEl.textContent
     };
 
-    // Imprimir en consola para revisar
-    // console.log("Registro a guardar:", registro);
-
-    // Guardar registro en la API
     window.pesajeAPI.guardarRegistro(data).then(respuesta => {
-      // Si el mensaje empieza con ❌, lo consideramos error
-      if (respuesta.startsWith("❌")) {
-        mostrarToast(respuesta, "error");
-      } else {
-        mostrarToast(respuesta, "success");
-      }
+      mostrarToast(respuesta, respuesta.startsWith("❌") ? "error" : "success");
     });
-
   });
 
   function mostrarToast(mensaje, tipo) {
-  const container = document.getElementById("toast-container");
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.classList.add("toast", tipo === "error" ? "toast-error" : "toast-success");
+    toast.innerText = mensaje;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateX(100%)";
+      setTimeout(() => container.removeChild(toast), 300);
+    }, 3000);
+  }
 
-  const toast = document.createElement("div");
-  toast.classList.add("toast");
-  toast.classList.add(tipo === "error" ? "toast-error" : "toast-success");
-  toast.innerText = mensaje;
+  // ---- Listener puerto serial ----
+  let inactivityTimer = null;
 
-  container.appendChild(toast);
-
-  // Desaparece después de 3 segundos
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateX(100%)";
-    setTimeout(() => container.removeChild(toast), 300);
-  }, 3000);
-  };
-
-
-  
-  // Escuchar los datos serial enviados desde main.js
   window.electronAPI.onSerialData((data) => {
-    // data.value contiene el número formateado exactamente como el indicador
-    brutoEl.textContent = data.value;
+    bruto = data.value; // actualizar variable interna
+    // actualizar número de decimales según el dato recibido
+    const partes = bruto.split(".");
+    decimalCount = partes[1] ? partes[1].length : 0;
+
+    actualizarNeto(); // recalcular neto
   });
 
+  // LED COM
+  window.pesajeAPI.onSerialStatus((status) => {
+    if (status === "activo") {
+      ledCOM.classList.add("on");
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        ledCOM.classList.remove("on"); // apagar LED si no hay datos
+      }, 1000);
+    }
+  });
 
   // Inicializar pantalla
   actualizarNeto();

@@ -79,7 +79,11 @@ const port = new SerialPort({
     // Enviar al renderer para actualizar UI / guardar en BD
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("serial-data", { raw, value: formatted });
+
+      // avisar que llegaron datos (para LED)
+      mainWindow.webContents.send("serial-status", "activo");
     }
+    
 
   });
 
